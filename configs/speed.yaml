@@ -1,0 +1,56 @@
+data:
+  csv_path: POWER_Point_Hourly_20150101_20250101_033d22N_122d43E_UTC.csv
+  skiprows: 15
+
+  ghi_col: ALLSKY_SFC_SW_DWN
+  ws_col: WS10M
+
+  # 快速验收：窗口和预测步先缩小
+  L: 24
+  H: 12
+  batch_size: 16
+  use_log1p: true
+
+  extra_exo_cols:
+    - T2M
+    - QV2M
+    - SZA
+    - CLRSKY_SFC_SW_DWN
+    - WD10M
+
+  # ⭐ 名字用你原来那套：splits
+  #   这里我们只取最近 3 个月来训，速度会快很多
+  splits:
+    train:
+      start: "2024-09-01"
+      end:   "2024-11-30"
+    val:
+      start: "2024-12-01"
+      end:   "2024-12-31"
+    test:
+      start: "2024-12-30 00:00:00"  # 从12月30日零点开始
+      end:   "2024-12-31 23:59:59"  # 到12月31日最后一分钟
+
+model:
+  d_model: 128
+  d_ctx: 128
+  flow_layers: 3
+  flow_hidden: 256
+
+train:
+  out_dir: experiments/exp_nasa_informer_flow/outputs
+  epochs: 2
+  lr: 1e-3
+  weight_decay: 0.0001
+  max_grad_norm: 1.0
+
+  lambda_phys: 0.02
+  lambda_ent: 0.0
+  log_scale_target: -1.5
+
+  seed: 42
+
+eval:
+  n_samples: 50
+  temperature_base: 1.10
+  temperature_slope: 0.20

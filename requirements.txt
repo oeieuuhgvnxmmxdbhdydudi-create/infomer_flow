@@ -1,6 +1,8 @@
-torch==2.2.2
-numpy==1.26.4
-pandas==2.2.2
-pyyaml==6.0.1
-matplotlib==3.9.2
-scipy==1.12.0
+torch
+numpy
+pandas
+pyyaml
+einops
+scikit-learn
+matplotlib
+tqdm

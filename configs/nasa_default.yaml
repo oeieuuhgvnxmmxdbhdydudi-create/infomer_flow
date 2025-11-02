@@ -1,44 +1,54 @@
 ﻿data:
-  csv_path: data/raw/nasa_power_hourly.csv
-  lat: null
-  lon: null
+  csv_path: POWER_Point_Hourly_20150101_20250101_033d22N_122d43E_UTC.csv
+  skiprows: 15
+
   ghi_col: ALLSKY_SFC_SW_DWN
   ws_col: WS10M
-  skiprows:
+
   L: 48
   H: 24
-  batch_size: 16
+  batch_size: 32
   use_log1p: true
-  convert_wh_to_wm2: true
+
   extra_exo_cols:
-    - CLRSKY_SFC_SW_DWN
     - T2M
     - QV2M
     - SZA
-  split:
-    train: {start: "2024-01-01 00:00", end: "2024-04-01 23:00"}
-    val:   {start: "2024-04-01 00:00", end: "2024-05-01 23:00"}
-    test:  {start: "2024-05-01 00:00", end: "2024-06-01 23:00"}
+    - CLRSKY_SFC_SW_DWN
+    - WD10M
+
+  # 👇 这里改成嵌套结构，配合 utils/split.py
+  splits:
+    train:
+      start: "2015-01-01"
+      end:   "2022-12-31"
+    val:
+      start: "2023-01-01"
+      end:   "2023-12-31"
+    test:
+      start: "2024-01-01"
+      end:   "2024-12-31"
 
 model:
   d_model: 256
   d_ctx: 256
-  flow_layers: 8
-  flow_hidden: 768
-  n_heads: 4
-  n_layers: 3
-  d_ff: 512
-  dropout: 0.2
-  include_exo: true
-  include_daymask: true
-  include_season: true
-  mean_pred_branch: true
+  flow_layers: 6
+  flow_hidden: 512
 
 train:
-  seed: 42
-  epochs: 5
-  lr: 7.0e-5
-  batch_size: 16
-  lambda_phys: 0.005
-  max_grad_norm: 1.0
   out_dir: experiments/exp_nasa_informer_flow/outputs
+  epochs: 3
+  lr: 0.00007
+  weight_decay: 0.0001
+  max_grad_norm: 1.0
+
+  lambda_phys: 0.05
+  lambda_ent: 0.05
+  log_scale_target: -1.5
+
+  seed: 42
+
+eval:
+  n_samples: 100
+  temperature_base: 1.10
+  temperature_slope: 0.20
